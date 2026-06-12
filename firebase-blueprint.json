@@ -1,0 +1,100 @@
+{
+  "entities": {
+    "User": {
+      "title": "UserProfile",
+      "description": "User profile with avatar, custom name and description.",
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "The email address of the agent."
+        },
+        "username": {
+          "type": "string",
+          "description": "Custom registered agent codename."
+        },
+        "avatar": {
+          "type": "string",
+          "description": "URL or preset logo reference to agent identity graphic."
+        },
+        "bio": {
+          "type": "string",
+          "description": "Narrative background bio of the active agent."
+        },
+        "joinedAt": {
+          "type": "string",
+          "description": "Date representing when the node registration took place."
+        }
+      },
+      "required": ["email", "username", "avatar", "joinedAt"]
+    },
+    "Character": {
+      "title": "CharacterCard",
+      "description": "Gaming character entity with dynamic combat statistics and ownership tracking.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique record identifier inside the grid."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the hero or villain character."
+        },
+        "game": {
+          "type": "string",
+          "description": "Source gaming series franchise."
+        },
+        "role": {
+          "type": "string",
+          "description": "Tactical class archetype or roles."
+        },
+        "rarity": {
+          "type": "string",
+          "enum": ["Common", "Uncommon", "Rare", "Epic", "Legendary"],
+          "description": "Rarity tier coefficient."
+        },
+        "bio": {
+          "type": "string",
+          "description": "Combat background story and lore details."
+        },
+        "stats": {
+          "type": "object",
+          "description": "Character raw ability indicators."
+        },
+        "image": {
+          "type": "string",
+          "description": "Visual character portrait image URI."
+        },
+        "likes": {
+          "type": "integer",
+          "description": "Total endorsements from other users."
+        },
+        "tags": {
+          "type": "array",
+          "description": "Set of trait identifiers."
+        },
+        "ownerEmail": {
+          "type": "string",
+          "description": "Owner credential link if custom minted."
+        },
+        "likedBy": {
+          "type": "array",
+          "description": "UIDs or emails of agents who liked this file."
+        }
+      },
+      "required": ["id", "name", "game", "role", "rarity", "bio", "stats", "image", "likes", "tags", "likedBy"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Stores agent private configurations and profile attributes."
+    },
+    "/characters/{characterId}": {
+      "schema": "Character",
+      "description": "Stores original and custom-minted gaming character vectors."
+    }
+  }
+}

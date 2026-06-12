@@ -1,0 +1,67 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // 1. Great safety net - default deny everything
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Global secure primitives
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-+:]+$');
+    }
+
+    // User Entity Rules
+    match /users/{userId} {
+      allow read: if isSignedIn();
+      allow create, update: if isOwner(userId) && isValidUser(request.resource.data);
+      allow delete: if false;
+
+      function isValidUser(data) {
+        return data.keys().hasAll(['email', 'username', 'avatar', 'joinedAt'])
+          && data.keys().size() <= 6
+          && data.email is string && data.email.size() <= 150
+          && data.username is string && data.username.size() <= 100
+          && data.avatar is string && data.avatar.size() <= 300
+          && data.joinedAt is string && data.joinedAt.size() <= 20;
+      }
+    }
+
+    // Character Card Rules
+    match /characters/{characterId} {
+      allow read: if true; // Public access to character list
+      allow create: if isSignedIn() && isValidCharacter(request.resource.data) && request.resource.data.ownerEmail == request.auth.token.email;
+      allow update: if isSignedIn() && isValidCharacter(request.resource.data) && (
+        // Case A: Owner editing character metadata fields
+        (resource.data.ownerEmail == request.auth.token.email && request.resource.data.ownerEmail == resource.data.ownerEmail)
+        ||
+        // Case B: Social endorsement (Likes updates). Restrict so other fields cannot be modified.
+        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likes', 'likedBy']))
+      );
+      allow delete: if isSignedIn() && resource.data.ownerEmail == request.auth.token.email;
+
+      function isValidCharacter(data) {
+        return data.keys().hasAll(['id', 'name', 'game', 'role', 'rarity', 'bio', 'stats', 'image', 'likes', 'tags', 'likedBy'])
+          && data.id is string && data.id.size() <= 100
+          && data.name is string && data.name.size() <= 150
+          && data.game is string && data.game.size() <= 150
+          && data.role is string && data.role.size() <= 150
+          && data.rarity is string && (data.rarity == 'Common' || data.rarity == 'Uncommon' || data.rarity == 'Rare' || data.rarity == 'Epic' || data.rarity == 'Legendary')
+          && data.bio is string && data.bio.size() <= 1000
+          && data.image is string && data.image.size() <= 500
+          && data.likes is int && data.likes >= 0
+          && data.tags is list && data.tags.size() <= 15
+          && data.likedBy is list && data.likedBy.size() <= 5000;
+      }
+    }
+  }
+}

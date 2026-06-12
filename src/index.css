@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+@theme {
+  --color-cyber-black: #050506;
+  --color-neon-cyan: #00f3ff;
+  --color-neon-purple: #7000ff;
+  --font-display: "Space Grotesk", "Inter", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+}
+
+@utility glass {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+@utility accent-glow {
+  box-shadow: 0 0 20px rgba(0, 243, 255, 0.15);
+}
+
+@utility neon-border {
+  border: 1px solid #00f3ff;
+  box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+}
+
+@utility focus-neon-border {
+  transition: all 0.2s ease;
+  &:focus {
+    border-color: #00f3ff;
+    box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+    outline: none;
+  }
+}
+
+@utility btn-primary {
+  background: linear-gradient(135deg, #00f3ff 0%, #7000ff 100%);
+  color: #050506;
+  font-weight: 700;
+  transition: transform 0.2s, box-shadow 0.2s;
+  &:hover {
+    box-shadow: 0 0 15px rgba(0, 243, 255, 0.35);
+  }
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+@utility text-glow-cyan {
+  text-shadow: 0 0 8px rgba(0, 243, 255, 0.4);
+}
+
+@utility text-glow-purple {
+  text-shadow: 0 0 8px rgba(112, 0, 255, 0.4);
+}
